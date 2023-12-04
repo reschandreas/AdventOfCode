@@ -11,7 +11,6 @@ import re
 
 
 def get_card_id_remove_prefix(line: str) -> Tuple[int, str]:
-    print(line)
     id: int = int(re.findall(r"Card\ *(\d+):", line)[0])
     postfix: str = line.split(":")[1]
     return id, postfix
@@ -58,9 +57,7 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11"""
         winners = [int(w) for w in re.findall(f"(\d+)", winners)]
         matches: [int] = [c for c in candidates if c in winners]
         cards.append((id, candidates, winners, matches))
-        print(matches)
         linewin: int = len(matches) if matches else 0
-        print(linewin)
 
     og_length: int = len(cards)
     og_cards = cards.copy()
@@ -81,5 +78,5 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11"""
 
 
 if __name__ == '__main__':
-    first()
+    #first()
     second()
