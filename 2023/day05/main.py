@@ -220,7 +220,6 @@ humidity-to-location map:
             seed_index += 2
             print(f"did {seed_index}")
         seeds = new_seeds
-        #json.dump(new_seeds, open("seeds.json", "w"))
     else:
         print("reading seeds.json")
         seeds = json.load(open("seeds.json", "r"))
