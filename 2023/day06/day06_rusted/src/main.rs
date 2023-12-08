@@ -36,7 +36,6 @@ Distance:   242   1017   1691   1252");
             let pushed: u64 = i;
             let remaining: u64 = *time - pushed;
             let traveled: u64 = pushed * remaining;
-            let dis: u64 = *distance;
             if traveled > *distance {
                 vec2.push(pushed);
             }
