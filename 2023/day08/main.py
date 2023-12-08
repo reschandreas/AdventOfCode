@@ -4,6 +4,7 @@ https://stackoverflow.com/a/56185125
 import os
 import sys
 import math
+
 sys.path.append(os.path.join(os.path.pardir, "utils"))  # Adds higher directory to python modules path.
 
 
@@ -37,16 +38,9 @@ ZZZ = (ZZZ, ZZZ)"""
     if lines[0] == '':
         lines.pop(0)
     parsed_line = {}
-    order = []
-    dead_ends = set()
     for line in lines:
         a, b, c = parse_line(line)
-        order.append(a)
-        if a == b and b == c:
-            dead_ends.add(a)
-            parsed_line[a] = ['dead', 'end']
-        else:
-            parsed_line[a] = [b, c]
+        parsed_line[a] = [b, c]
     i = 0
     steps = 0
     current_location = "AAA"
@@ -60,58 +54,48 @@ ZZZ = (ZZZ, ZZZ)"""
         if i >= len(instructions):
             i = 0
         steps += 1
-    print(steps)
-    print(parsed_line)
+    print(f"overall {steps}")
 
 
 def second():
-    value: str = """LR
-
-11A = (11B, XXX)
-11B = (XXX, 11Z)
-11Z = (11B, XXX)
-22A = (22B, XXX)
-22B = (22C, 22C)
-22C = (22Z, 22Z)
-22Z = (22B, 22B)
-XXX = (XXX, XXX)"""
+#     value: str = """LR
+#
+# 11A = (11B, XXX)
+# 11B = (XXX, 11Z)
+# 11Z = (11B, XXX)
+# 22A = (22B, XXX)
+# 22B = (22C, 22C)
+# 22C = (22Z, 22Z)
+# 22Z = (22B, 22B)
+# XXX = (XXX, XXX)"""
     value = open("first.txt", "r").read()
     lines = value.splitlines()
-    instructions = lines.pop(0)
+    instructions = [int(l) for l in lines.pop(0).replace("L", "0 ").replace("R", "1 ").strip().split(" ")]
     if lines[0] == '':
         lines.pop(0)
     parsed_line = {}
-    order = []
-    dead_ends = set()
     for line in lines:
         a, b, c = parse_line(line)
-        order.append(a)
-        if a == b and b == c:
-            dead_ends.add(a)
-        else:
-            parsed_line[a] = [b, c]
+        parsed_line[a] = [b, c]
+
+    current_locations = [loc for loc in parsed_line.keys() if loc[2] == "A"]
+    was_at_location = []
+
     i = 0
     steps = 0
-    # 21251 too low
-    current_locations = [loc for loc in parsed_line.keys() if loc.endswith("A")]
-    was_at_location = [0 for loc in parsed_line.keys() if loc.endswith("A")]
-
-    i = 0
-    while any([loc == 0 for loc in was_at_location]):
+    inst_length = len(instructions)
+    length = len(current_locations)
+    while length > 0:
         steps += 1
-        for index, location in enumerate(current_locations):
-            command = parsed_line[location]
-            if instructions[i] == 'L':
-                current_locations[index] = command[0]
-            else:
-                current_locations[index] = command[1]
+        inst: int = instructions[i]
+        tmp = length
+        current_locations = [parsed_line[l][inst] for l in current_locations if parsed_line[l][inst][2] != 'Z']
+        length = len(current_locations)
+        if tmp != length:
+            was_at_location.append(steps)
+        i = i + 1 if inst_length - 1 > i else 0
+    print(lcm(was_at_location))
 
-            if current_locations[index].endswith("Z"):
-                was_at_location[index] = steps
-        i += 1
-        if i >= len(instructions):
-            i = 0
-    print(f"Overall {lcm(was_at_location)}")
 
 def lcm(array: list) -> int:
     lcm = 1
@@ -121,5 +105,5 @@ def lcm(array: list) -> int:
 
 
 if __name__ == '__main__':
-    # first()
+    #first()
     second()
