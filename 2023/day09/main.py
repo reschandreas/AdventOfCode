@@ -8,6 +8,7 @@ import math
 sys.path.append(os.path.join(os.path.pardir, "utils"))  # Adds higher directory to python modules path.
 import re
 
+
 def parse_line(line: str) -> [int]:
     return [int(i) for i in line.split(" ")]
 
@@ -22,8 +23,6 @@ def get_sequences(parsed):
             all_zero = True
             sequence = []
             for prev, current in zip(line_sequences[-1], line_sequences[-1][1:]):
-                if current < 0 or prev < 0:
-                    current = current
                 tmp = current - prev
                 if tmp != 0:
                     all_zero = False
@@ -32,6 +31,7 @@ def get_sequences(parsed):
 
         sequences.append(line_sequences)
     return sequences
+
 
 def first():
     value: str = """0 3 6 9 12 15
@@ -76,7 +76,6 @@ def second():
     print(sum(new_firsts))
 
 
-
 if __name__ == '__main__':
-    #first()
+    # first()
     second()
