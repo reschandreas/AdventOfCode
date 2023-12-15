@@ -72,8 +72,9 @@ def find_value_of_pattern(pattern: str, method) -> int:
     lines = pattern.splitlines()
     columns = transpose(lines)
     mirror = method(columns)
-    mirr = method(lines)
-    mirror = mirr * 100
+    if mirror is None:
+        mirr = method(lines)
+        mirror = mirr * 100
     return mirror
 
 def first():
@@ -92,7 +93,7 @@ def first():
 #####.##.
 ..##..###
 #....#..#"""
-    # value = open("first.txt").read()
+    value = open("first.txt").read()
     patterns = value.split("\n\n")
     sum = 0
     for pattern in patterns:
@@ -126,5 +127,5 @@ def second():
 
 
 if __name__ == '__main__':
-    #first()
-    second()
+    first()
+    #second()
