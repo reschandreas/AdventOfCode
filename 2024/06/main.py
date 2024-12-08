@@ -112,48 +112,82 @@ def clone_matrix(matrix: List[List[str]]) -> List[List[str]]:
         tmp.append(line.copy())
     return tmp
 
-
-def move(guard_position: (int, int, str), matrix: List[List[str]]):
+def move_with_loop_check(guard_position: (int, int, str), matrix: List[List[str]]):
     out_of_map: bool = False
-    steps: int = 0
     matrix_size: int = len(matrix)
+    visited_cells: set = set()
+    start = guard_position
+    unique_loops: set = set()
     while not out_of_map:
         row, column, direction = guard_position
         if is_outside(row, column, matrix_size):
             return True
-        already_walked = matrix[row][column] == 'X'
-        if not already_walked:
-            matrix[row][column] = 'X'
-        if not already_walked:
-            steps += 1
+        visited_cells.add((row, column))
+        wall = wall_ahead(guard_position=guard_position, matrix=matrix)
+        if wall is None:
+            break
+        if wall:
+            new_direction = get_next_sign(direction)
+            guard_position = (row, column, new_direction)
+        next_cell = get_next_cell(guard_position=guard_position, matrix=matrix)
+        if next_cell and next_cell != '#':
+            tmp = clone_matrix(matrix=matrix)
+            r, c = get_next_cell_indizes(guard_position=guard_position)
+            tmp[r][c] = '#'
+            if find_loop(guard_position=start, matrix=tmp):
+                unique_loops.add((r, c))
         guard_position = get_next(guard_position=guard_position, matrix=matrix)
         if not guard_position:
-            return steps
-    return steps
+            break
+    return len(unique_loops)
+
+def move(guard_position: (int, int, str), matrix: List[List[str]]):
+    out_of_map: bool = False
+    matrix_size: int = len(matrix)
+    visited_cells: set = set()
+    while not out_of_map:
+        row, column, direction = guard_position
+        if is_outside(row, column, matrix_size):
+            return True
+        visited_cells.add((row, column))
+        wall = wall_ahead(guard_position=guard_position, matrix=matrix)
+        if wall is None:
+            break
+        if wall:
+            new_direction = get_next_sign(direction)
+            guard_position = (row, column, new_direction)
+        guard_position = get_next(guard_position=guard_position, matrix=matrix)
+        if not guard_position:
+            return len(visited_cells)
+    return len(visited_cells)
+
+
+def get_guard_position(matrix: List[List[str]]) -> (int, int, str):
+    for row, line in enumerate(matrix):
+        for column, cell in enumerate(line):
+            if cell == '^':
+                return row, column, '^'
 
 
 def first_part():
     matrix: List[List[str]] = []
-    guard_position: Optional[(int, int, str)] = None
     for row, line in enumerate(lines_of_file("first.txt")):
-        if not guard_position:
-            if '^' in line:
-                guard_position = (row, line.index('^'), '^')
         matrix.append([c for c in line])
-    print(move(guard_position=guard_position, matrix=matrix))
+    guard_position: Optional[(int, int, str)] = get_guard_position(matrix=matrix)
+    steps: int = move(guard_position=guard_position, matrix=matrix)
+    print(steps)
     # for line in matrix:
     #     print("".join(line))
 
 
 def second_part():
     matrix: List[List[str]] = []
-    guard_position: Optional[(int, int, str)] = None
     for row, line in enumerate(lines_of_file("first.txt")):
-        if not guard_position:
-            if '^' in line:
-                guard_position = (row, line.index('^'), '^')
         matrix.append([c for c in line])
-    brute_force(guard_position=guard_position, matrix=matrix)
+    guard_position: Optional[(int, int, str)] = get_guard_position(matrix=matrix)
+    # brute_force(guard_position=guard_position, matrix=matrix)
+    loops: int = move_with_loop_check(guard_position=guard_position, matrix=matrix)
+    print("loops", loops)
 
 
 def main():
