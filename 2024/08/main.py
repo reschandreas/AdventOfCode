@@ -26,7 +26,7 @@ def collect_antennas(matrix: List[List[str]]) -> dict[str, list[(int, int)]]:
     antennas: dict[str, List[(int, int)]] = {}
     for row, line in enumerate(matrix):
         for columm, char in enumerate(line):
-            if char == '.' and char != '#':
+            if char == '.' or char == '#':
                 continue
             if not char in antennas:
                 antennas[char] = []
@@ -34,32 +34,36 @@ def collect_antennas(matrix: List[List[str]]) -> dict[str, list[(int, int)]]:
     return antennas
 
 
-def compute_antinodes(antennas: List[Any]) -> List[Any]:
+def compute_antinodes(antennas: List[Any], part_two: bool = False, x_limit: int = -1, y_limit: int = -1) -> List[Any]:
     antinodes: set = set()
     for p in itertools.combinations(antennas, 2):
         first, second = p
+        if part_two:
+            antinodes.add(first)
+            antinodes.add(second)
         fx, fy = first
         sx, sy = second
         diff_x = fx - sx
         diff_y = fy - sy
         antinodes.add((fx - 2 * diff_x, fy - 2 * diff_y))
-        # antinodes.add((fx + 2 * diff_x, fy + 2 * diff_y))
         antinodes.add((sx + 2 * diff_x, sy + 2 * diff_y))
-    return [(a, b) for (a, b) in list(antinodes) if a >= 0 and b >= 0]
-    # return list(antinodes - set(antennas))
+        if part_two:
+            multiplicator = 3
+            while 0 <= fx - multiplicator * diff_x < x_limit  and 0 <= fy - multiplicator * diff_y < y_limit:
+                antinodes.add((fx - multiplicator * diff_x, fy - multiplicator * diff_y))
+                multiplicator += 1
+            multiplicator = 3
+            while 0 <= sx + multiplicator * diff_x < x_limit and 0 <= sy + multiplicator * diff_y < y_limit:
+                antinodes.add((sx + multiplicator * diff_x, sy + multiplicator * diff_y))
+                multiplicator += 1
+    return [(a, b) for (a, b) in list(set(antinodes)) if a >= 0 and b >= 0]
 
 
 def first_part():
     matrix: List[List[str]] = get_input()
-    all_antennas = set()
     antennas = collect_antennas(matrix=matrix)
     antinodes = []
-    closer_look: str = '4'
     for antenna in antennas:
-        # if antenna != closer_look:
-        #     continue
-        for a in antennas[antenna]:
-            all_antennas.add(a)
         for antinode in compute_antinodes(antennas=antennas[antenna]):
             antinodes.append(antinode)
 
@@ -71,7 +75,18 @@ def first_part():
     # print_matrix(matrix=matrix)
 
 def second_part():
-    pass
+    matrix: List[List[str]] = get_input()
+    antennas = collect_antennas(matrix=matrix)
+    all_antennas = set()
+    antinodes = []
+    for antenna in antennas:
+        for a in antennas[antenna]:
+            all_antennas.add(a)
+        for antinode in compute_antinodes(antennas=antennas[antenna], part_two=True, x_limit=len(matrix), y_limit=len(matrix[0])):
+            antinodes.append(antinode)
+    antinodes = set([(x, y) for (x, y) in list(set(antinodes)) if 0 <= x < len(matrix) and 0 <= y < len(matrix[x])])
+    print("all in all", len(antinodes))
+    # print_matrix(matrix=matrix)
 
 
 def main():
