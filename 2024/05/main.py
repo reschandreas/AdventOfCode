@@ -1,4 +1,3 @@
-import re
 from typing import List, Optional, Set
 
 
@@ -23,6 +22,7 @@ def get_rules(lines: List[str]) -> dict[int, Set[int]]:
             rules[before].add(after)
     return rules
 
+
 def get_updates(lines: List[str]) -> List[List[int]]:
     updates: List[List[int]] = []
     for line in lines:
@@ -45,6 +45,7 @@ def get_rules_and_updates() -> (dict[int, Set[int]], List[List[int]]):
             rule_lines.append(line)
     return get_rules(rule_lines), get_updates(updates_lines)
 
+
 def first_part():
     (rules, updates) = get_rules_and_updates()
 
@@ -53,6 +54,7 @@ def first_part():
         if check_update(rules=rules, update=update):
             valid.append(update)
     print("sum", sum_up(valid))
+
 
 def check_update(rules: dict[int, Set[int]], update: List[int]) -> bool:
     fine: bool = True
@@ -65,6 +67,7 @@ def check_update(rules: dict[int, Set[int]], update: List[int]) -> bool:
             fine = False
             break
     return fine
+
 
 def replace_first_wrong_one(rules: dict[int, Set[int]], update: List[int]) -> Optional[List[int]]:
     if check_update(rules=rules, update=update):
@@ -82,12 +85,14 @@ def replace_first_wrong_one(rules: dict[int, Set[int]], update: List[int]) -> Op
             return replace_first_wrong_one(rules=rules, update=update)
     return None
 
+
 def sum_up(valid: List[List[int]]) -> int:
     s: int = 0
     for update in valid:
         s += update[int((len(update) - 1) / 2)]
         # print(update)
     return s
+
 
 def second_part():
     (rules, updates) = get_rules_and_updates()
@@ -107,6 +112,7 @@ def second_part():
         if tmp:
             valid.append(tmp)
     print("sum", sum_up(valid))
+
 
 def main():
     first_part()

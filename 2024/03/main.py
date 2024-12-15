@@ -1,5 +1,5 @@
 import re
-from typing import List, Optional
+from typing import List
 
 
 def get_lines(string: str) -> list[str]:
@@ -24,6 +24,7 @@ def first_part():
         result += numbers[0] * numbers[1]
     print(result)
 
+
 def second_part():
     lines = lines_of_file("first.txt")
     line = lines.pop(0)
@@ -43,6 +44,7 @@ def second_part():
             print(numbers)
             result += numbers[0] * numbers[1]
     print(result)
+
 
 def main():
     first_part()

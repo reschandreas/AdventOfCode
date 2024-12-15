@@ -10,6 +10,7 @@ def lines_of_file(filename: str) -> list[str]:
     with open(filename, "r") as file:
         return get_lines(file.read())
 
+
 def is_correct_order(result: int, parts: List[int], operators: List[str], acc: int) -> bool:
     if len(parts) == 0:
         return result == acc
@@ -22,6 +23,7 @@ def is_correct_order(result: int, parts: List[int], operators: List[str], acc: i
     if tmp > result:
         return False
     return is_correct_order(result, parts, operators, tmp)
+
 
 def is_second_correct_order(result: int, parts: List[int], operators: List[str], acc: int) -> bool:
     if len(parts) == 0:
@@ -50,6 +52,7 @@ def possible_makeups(length: int) -> List[List[str]]:
         tmp.append(t)
     return tmp
 
+
 def possible_second_makeups(length: int):
     tmp: List[List[str]] = []
     for value in list(itertools.product('+*o', repeat=length)):
@@ -59,8 +62,10 @@ def possible_second_makeups(length: int):
         tmp.append(t)
     return tmp
 
+
 def first_part():
-    lines: List[(int, List[int])] = [(int(line.split(':')[0]), [int(c) for c in line.split(':')[1].strip().split(' ')])for line in lines_of_file("first.txt")]
+    lines: List[(int, List[int])] = [(int(line.split(':')[0]), [int(c) for c in line.split(':')[1].strip().split(' ')])
+                                     for line in lines_of_file("first.txt")]
     product: int = 0
     permutations: dict[int, List[List[str]]] = {}
     invalid: List[(int, List[int])] = []
@@ -81,6 +86,7 @@ def first_part():
             invalid.append((result, parts))
         # print(f"{result} -> {parts}: {possible_operators}")
     return product, invalid
+
 
 def second_part():
     (product, lines) = first_part()

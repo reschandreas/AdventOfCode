@@ -46,6 +46,7 @@ def is_safe(numbers: List[int]) -> bool:
             break
     return safe
 
+
 def compare_to_previous(number: int, last: int, ascending: List[int], descending: List[int]) -> (List[int], List[int]):
     tmp: int = number - last
     if tmp > 0 and abs(tmp) in [1, 2, 3]:
@@ -68,6 +69,7 @@ def compare_to_previous(number: int, last: int, ascending: List[int], descending
             descending.append(number)
     return ascending, descending
 
+
 def second_part():
     lines = lines_of_file("first.txt")
     safe_lines: List[List[int]] = []
@@ -88,7 +90,7 @@ def second_part():
 
         safe = len(numbers) == len(ascending) or len(numbers) == len(descending) or len(tmp_numbers) == len(
             ascending
-            ) or len(tmp_numbers) == len(descending)
+        ) or len(tmp_numbers) == len(descending)
         if safe:
             safe_lines.append(tmp_numbers)
         else:

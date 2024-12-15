@@ -1,5 +1,5 @@
 import itertools
-from typing import List, Dict, Any
+from typing import List, Any
 
 
 def get_lines(string: str) -> list[str]:
@@ -16,6 +16,7 @@ def get_input() -> List[List[str]]:
     for line in lines_of_file('first.txt'):
         matrix.append([c for c in line])
     return matrix
+
 
 def print_matrix(matrix: List[List[str]]):
     for line in matrix:
@@ -49,7 +50,7 @@ def compute_antinodes(antennas: List[Any], part_two: bool = False, x_limit: int 
         antinodes.add((sx + 2 * diff_x, sy + 2 * diff_y))
         if part_two:
             multiplicator = 3
-            while 0 <= fx - multiplicator * diff_x < x_limit  and 0 <= fy - multiplicator * diff_y < y_limit:
+            while 0 <= fx - multiplicator * diff_x < x_limit and 0 <= fy - multiplicator * diff_y < y_limit:
                 antinodes.add((fx - multiplicator * diff_x, fy - multiplicator * diff_y))
                 multiplicator += 1
             multiplicator = 3
@@ -74,6 +75,7 @@ def first_part():
     print("all in all", len(set([(x, y) for (x, y) in antinodes if 0 <= x < len(matrix) and 0 <= y < len(matrix[x])])))
     # print_matrix(matrix=matrix)
 
+
 def second_part():
     matrix: List[List[str]] = get_input()
     antennas = collect_antennas(matrix=matrix)
@@ -82,7 +84,9 @@ def second_part():
     for antenna in antennas:
         for a in antennas[antenna]:
             all_antennas.add(a)
-        for antinode in compute_antinodes(antennas=antennas[antenna], part_two=True, x_limit=len(matrix), y_limit=len(matrix[0])):
+        for antinode in compute_antinodes(
+            antennas=antennas[antenna], part_two=True, x_limit=len(matrix), y_limit=len(matrix[0])
+            ):
             antinodes.append(antinode)
     antinodes = set([(x, y) for (x, y) in list(set(antinodes)) if 0 <= x < len(matrix) and 0 <= y < len(matrix[x])])
     print("all in all", len(antinodes))

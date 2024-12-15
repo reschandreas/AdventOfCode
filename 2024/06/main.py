@@ -112,6 +112,7 @@ def clone_matrix(matrix: List[List[str]]) -> List[List[str]]:
         tmp.append(line.copy())
     return tmp
 
+
 def move_with_loop_check(guard_position: (int, int, str), matrix: List[List[str]]):
     out_of_map: bool = False
     matrix_size: int = len(matrix)
@@ -140,6 +141,7 @@ def move_with_loop_check(guard_position: (int, int, str), matrix: List[List[str]
         if not guard_position:
             break
     return len(unique_loops)
+
 
 def move(guard_position: (int, int, str), matrix: List[List[str]]):
     out_of_map: bool = False

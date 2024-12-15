@@ -1,11 +1,14 @@
 from typing import List
 
+
 def get_lines(string: str) -> list[str]:
     return string.split("\n")
+
 
 def lines_of_file(filename: str) -> list[str]:
     with open(filename, "r") as file:
         return get_lines(file.read())
+
 
 def first_part():
     lines = lines_of_file("first.txt")
@@ -26,8 +29,8 @@ def first_part():
         sum += abs(tmp)
         differences.append(tmp)
 
-
     print(sum)
+
 
 def second_part():
     lines = lines_of_file("first.txt")
@@ -52,6 +55,7 @@ def second_part():
 def main():
     # first_part()
     second_part()
+
 
 if __name__ == '__main__':
     main()

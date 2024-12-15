@@ -1,5 +1,4 @@
-import re
-from typing import List, Optional
+from typing import List
 
 
 def get_lines(string: str) -> list[str]:
@@ -120,6 +119,7 @@ def first_part():
     #     print(''.join(line))
     print(found_xmas)
 
+
 def second_part():
     matrix: List[List[str]] = []
     found: List[List[str]] = []
@@ -171,6 +171,7 @@ def second_part():
     # for line in found:
     #     print(''.join(line))
     print(found_xmas)
+
 
 def main():
     first_part()
