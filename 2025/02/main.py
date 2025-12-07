@@ -67,7 +67,6 @@ def part_two():
     print("result is", result)
 
 
-# too low 5352
 if __name__ == '__main__':
     part_one()
     print("========")
