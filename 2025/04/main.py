@@ -1,107 +1,106 @@
-from enum import Enum
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Set
 
 
-class Item(Enum):
+class Recipe:
+    ranges: List[Tuple[int, int]] = []
+    ingredients: List[int] = []
 
-    PaperRoll = '@'
-    Empty = '.'
-    Marked = 'x'
-
-class Map:
-
-    layout: List[List[Item]]
-    visualized: List[List[Item]]
-
-    def __init__(self, lines: List[str]) -> None:
-        self.layout = []
-        self.visualized = []
+    def __init__(self, lines: List[str]):
+        self.ranges = []
+        self.ingredients = []
         for line in lines:
-            mapped: List[Item] = [Item(x) for x in line.removesuffix("\n")]
-            self.layout.append(mapped)
-            self.visualized.append([Item(x) for x in line.removesuffix("\n")])
+            line = line.removesuffix("\n")
+            if not line:
+                continue
+            if "-" in line:
+                tmp: List[int] = [int(t) for t in line.split("-")]
+                self.ranges.append((tmp[0], tmp[1]))
+            else:
+                self.ingredients.append(int(line))
 
-    def can_be_accessed(self, row: int, column: int) -> bool:
-        if row == 0 and column == 7:
-            row = 0
-        if self.layout[row][column] == Item.Empty:
-            return False
-        counter: int = 0
+    def get_fresh_ingredients(self) -> List[int]:
+        fresh_ones: List[int] = []
+        for ingredient in self.ingredients:
+            if ingredient in fresh_ones:
+                continue
+            for r in self.ranges:
+                if r[0] <= ingredient <= r[1]:
+                    fresh_ones.append(ingredient)
+                    break
+        return fresh_ones
 
-        prev_row: int = max(0, row - 1)
-        prev_col: int = max(0, column - 1)
+    def count_up_ranges(self):
+        tmp = self.ranges.copy()
+        tmp = sorted(tmp, key=lambda tup: tup[0])
+        # first only merge adjacent ranges
+        current_index: int = 0
+        while current_index < len(tmp):
+            new_range = tmp[current_index]
+            a_start, a_end = tmp[current_index]
+            for j, other_one in enumerate(tmp[current_index:]):
+                if new_range == other_one:
+                    continue
+                (b_start, b_end) = other_one
+                if a_start <= b_start:
+                    if a_end >= b_end:
+                        # a consumes b, remove b
+                        del tmp[current_index + j]
+                        current_index -= 1
+                        break
+                    if a_end >= b_start or a_end + 1 == b_end:
+                        tmp[current_index] = (a_start, max(a_end, b_end))
+                        a_start, a_end = tmp[current_index]
+                        del tmp[current_index + j]
+                        current_index -= 1
+                        break
 
-        indices_to_check: List[List[Tuple[int, int]]] = [
-            [(prev_row, prev_col), (prev_row, column), (prev_row, column + 1)],
-            [(row, prev_col), (row, column + 1)],
-            [(row + 1, prev_col), (row + 1, column), (row + 1, column + 1)],
-        ]
-        # if we are in the first column, we dont need to check stuff on the left, same on the right
-        if column == 0:
-            for i in range(3):
-                indices_to_check[i].pop(0)
-        elif column == len(self.layout[0]) - 1:
-            for i in range(3):
-                indices_to_check[i].pop()
-        # if we are on top, we can skip all the ones above
-        if row == 0:
-            indices_to_check[0] = []
-        #if we are on the bottom, we can skip the ones below
-        if row == len(self.layout) - 1:
-            indices_to_check[2] = []
-
-        for check in indices_to_check:
-            for x, y in check:
-                if self.layout[x][y] == Item.PaperRoll:
-                    counter += 1
-        return counter < 4
-
-
-    def run_over_map(self) -> int:
-        counter: int = 0
-        for row in range(len(self.layout)):
-            for column in range(len(self.layout[0])):
-                if self.can_be_accessed(row, column):
-                    counter += 1
-                    self.visualized[row][column] = Item.Marked
-        return counter
-
-    def run_over_map_and_remove(self) -> int:
-        counter: int = 0
-        previous_counter: int = -1
-        while counter != previous_counter:
-            previous_counter = counter
-            counter = 0
-            for row in range(len(self.layout)):
-                for column in range(len(self.layout[0])):
-                    if self.can_be_accessed(row, column):
-                        counter += 1
-                        self.visualized[row][column] = Item.Marked
-                        # removes the need to iterate over it all the time
-                        self.layout[row][column] = Item.Marked
-        return counter
-
-    def visualize(self):
-        for row in self.visualized:
-            print("".join([x.value for x in row]))
+            current_index += 1
+        return list(set(tmp))
 
 
-def get_map(file: str) -> Map:
-    lines: List[str] = open(f"{file}.txt").readlines()
-    return Map(lines)
+    def reduce_ranges(self, original: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
+        combined_ranges: List[Tuple[int, int]] = original.copy()
+        current_index: int = 0
+        while current_index < len(combined_ranges):
+            current_range: Tuple[int, int] = combined_ranges[current_index]
+            a_start, a_end = current_range
+            for index, compare in enumerate(combined_ranges):
+                b_start, b_end = compare
+                if a_start == b_start and a_end == b_end:
+                    continue
+                if a_start <= b_start and a_end >= b_end:
+                    # b is included in a
+                    del combined_ranges[index]
+                    current_index -= 1
+                    break
+                if a_start <= b_start <= a_end:
+                    # they overlap
+                    combined_ranges[current_index] = (a_start, b_end)
+                    current_index -= 1
+                    del combined_ranges[index]
+                elif a_start <= b_start and a_end == b_end - 1:
+                    combined_ranges[current_index] = (a_start, b_end)
+                    current_index -= 1
+                    del combined_ranges[index]
+            current_index += 1
+        return combined_ranges
+
+
+    def get_all_fresh_IDs(self) -> int:
+        combined_ranges = self.count_up_ranges()
+        fresh_ids: List[int] = []
+        for r in combined_ranges:
+            fresh_ids.append(r[1] + 1 - r[0])
+        return sum(fresh_ids)
 
 
 def part_one():
-    m: Map = get_map("first")
-    result: int = m.run_over_map()
-    m.visualize()
-    print("result is ", result)
+    recipe: Recipe = Recipe(open("first.txt").readlines())
+    print("result is", len(recipe.get_fresh_ingredients()))
 
 def part_two():
-    m: Map = get_map("first")
-    result: int = m.run_over_map_and_remove()
-    m.visualize()
-    print("result is ", result)
+    recipe: Recipe = Recipe(open("first.txt").readlines())
+    print("result is", recipe.get_all_fresh_IDs())
 
 
 if __name__ == '__main__':
